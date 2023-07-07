@@ -1,59 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat app</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
 
-    <title>Let Chat</title>
-  </head>
+<body>
+    <section class="chat__section">
+        <div class="brand">
+            <img height="40" src="/wassup.png" alt="">
+            <h1>Chat</h1>
+        </div>
+        <form id="form" action="" >
+            <label for="">Username:</label>
+            <input type="text" id="uname" autocomplete="off"/><br><br>
+            <label for="">Room Name:</label>
+            <input type="text" id="room" autocomplete="off" />
+            <button>Join</button> 
+            <!-- <button id="myButton" class="float-left submit-button" >
+                <a href="/chat"> Join </a></button> -->
+        </form>
+    </section>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script>
+        var form = document.getElementById('form')
+        var uname = document.getElementById('uname');
+        var room = document.getElementById('room');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (uname.value && room.value){
+                localStorage.setItem("uname", uname.value )
+                localStorage.setItem("room", room.value )
+                console.log(uname.value);
+                location.href="/chat";
+        //   socket.emit('chat message', input.value);
+        //   input.value = '';
+            // } else {
+            //     localStorage.setItem("uname", uname.value )
+            //     //console.log(uname.value);
+            //     location.href="/chat";
+            }
+        })
+    </script>
+</body>
 
-  <body>
-    <nav class="navbar navbar-light bg-light">
-      <div class="container-fluid">
-        <a class="navbar-brand">Lets Chat</a>
-      </div>
-    </nav>
-    <div class="container">
-      <div class="mb-3 mt-3">
-        <ul style="list-style: none" id="data-container"></ul>
-      </div>
-      <div class="mb-3 mt-4">
-        <input
-          class="form-control"
-          id="email"
-          rows="3"
-          placeholder="Your Email"
-        />
-      </div>
-      <div class="mb-3 mt-4">
-        <input
-          class="form-control"
-          id="exampleFormControlTextarea1"
-          rows="3"
-          placeholder="Say something..."
-        />
-      </div>
-    </div>
-    <script
-      src="https://cdn.socket.io/4.3.2/socket.io.min.js"
-      integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs"
-      crossorigin="anonymous"
-    ></script>
-    <script src="app.js"></script>
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"
-    ></script>
-  </body>
 </html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat app</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <section class="chat__section">
+        <div class="brand">
+            <img height="40" src="/wassup.png" alt="">
+            <h1>Chat</h1>
+        </div>
+        <div class="message__area"></div>
+        <div>
+            <textarea id="textarea" cols="30" rows="1" placeholder="Write a message..."></textarea>
+        </div>
+    </section>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/client.js"></script>
+</body>
+
+</html> -->

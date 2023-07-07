@@ -5,15 +5,49 @@ import { ChatService } from './chat.service';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Get('/chat')
+  @Get('/')
   @Render('index')
   Home() {
-    return { message: 'Hello world!' };
+    // return { message: 'Hello world!' };
   }
 
-  @Get('/api/chat')
+  @Get('/chat')
+  @Render('chat')
   async Chat(@Res() res) {
-    const messages = await this.chatService.getMessages();
-    res.json(messages);
+    // const messages = await this.chatService.getMessages();
+    // res.json(messages);
   }
+
+  //=================== demo chat ========================//
+
+  // @Get('/demo')
+  // @Render('demo')
+  // Demo() {
+  // return { message: 'Hello world!' };
+  // }
+
+  //======================== old chat app ====================//
+
+  // @Get('/chat')
+  // @Render('index')
+  // Home() {
+  //   return { message: 'Hello world!' };
+  // }
+
+  // @Get('/api/chat')
+  // async Chat(@Res() res) {
+  //   const messages = await this.chatService.getMessages();
+  //   res.json(messages);
+  // }
+
+  //======================= node code (Reference) =================//
+
+  // app.get("/", (req, res) => {
+  //   //console.log(req);
+  //   res.sendFile(__dirname + "/index.html");
+  // });
+
+  // app.get("/chat", (req, res) => {
+  //   res.sendFile(__dirname + "/chat.html");
+  // });
 }

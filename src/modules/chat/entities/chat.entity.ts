@@ -16,13 +16,26 @@ export class Chat extends Model<Chat> {
 
   @Column({
     type: DataType.STRING,
-    // unique: true,
     allowNull: false,
   })
-  email: string;
+  user: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  room: string;
 
   @Column({
     type: DataType.STRING,
   })
-  text: string;
+  message: string;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  time: string;
 }
+
+// send-data object
+// { time: '14:22 pm', room: 'xyz', msg: 'hello', user: 'jaydeep' }

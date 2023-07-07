@@ -1,7 +1,8 @@
 import { Sequelize } from 'sequelize-typescript';
 import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../constants';
 import { databaseConfig } from './database.config';
-import { Chat } from 'src/modules/chat/chat.entity';
+import { Chat } from 'src/modules/chat/entities/chat.entity';
+import { Room } from 'src/modules/room/entities/room.entity';
 
 export const databaseProviders = [
   {
@@ -22,7 +23,7 @@ export const databaseProviders = [
           config = databaseConfig.development;
       }
       const sequelize = new Sequelize(config);
-      sequelize.addModels([Chat]);
+      sequelize.addModels([Chat, Room]);
       await sequelize.sync();
       return sequelize;
     },

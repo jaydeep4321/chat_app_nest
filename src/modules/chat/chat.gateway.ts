@@ -7,8 +7,11 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { Chat } from './chat.entity';
+import { Chat } from './entities/chat.entity';
 import { ChatService } from './chat.service';
+import { promises } from 'dns';
+import { RoomService } from '../room/room.service';
+import { Room } from '../room/entities/room.entity';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -17,15 +20,12 @@ import { ChatService } from './chat.service';
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private chatService: ChatService,
+    private roomService: RoomService,
+  ) {}
 
   @WebSocketServer() server: Server;
-
-  @SubscribeMessage('sendMessage')
-  async handleSendMessage(client: Socket, payload: Chat): Promise<void> {
-    await this.chatService.createMessage(payload);
-    this.server.emit('recMessage', payload);
-  }
 
   afterInit(server: Server) {
     // console.log(server);
@@ -41,4 +41,63 @@ export class ChatGateway
     console.log(`Connected ${client.id}`);
     //Do stuffs
   }
+
+  // @SubscribeMessage('sendMessage')
+  // async handleSendMessage(client: Socket, payload: Chat): Promise<void> {
+  //   await this.chatService.createMessage(payload);
+  //   this.server.emit('recMessage', payload);
+  // }
+
+  @SubscribeMessage('room')
+  async handleJoinRoom(client: Socket, data: Room) {
+    console.log('data before room joined!!', data);
+    const room = await this.roomService.createRoom(data);
+    // console.log(room);
+    client.join(data.room);
+    client.emit('welcome-to-room', {
+      message: `welcome to room - ${data.room}`,
+      time: data.time,
+      room: data.room,
+    });
+    client.to(data.room).emit('user-joined-room', {
+      message: 'joined room',
+      user: data.user,
+      time: data.time,
+    });
+  }
+
+  @SubscribeMessage('leave-room')
+  async handleLeave(client: Socket, data: Room) {
+    console.log('data before leave-room', data);
+    client.leave(data.room);
+    client.to(data.room).emit('left', {
+      message: `${data.user} has left the room`,
+      time: data.time,
+      room: data.room,
+    });
+  }
+
+  @SubscribeMessage('send-chat')
+  async handleSendChat(client: Socket, data: any) {
+    console.log('send-chat ====>', data);
+
+    const chat = await this.chatService.createMessage(data);
+    console.log('stored-chat', chat);
+    client.to(data.room).emit('receive-chat', {
+      message: data.message,
+      user: data.user,
+      time: data.time,
+    });
+  }
+
+  @SubscribeMessage('typing')
+  handleTyping(client: Socket, data: Room) {
+    console.log('data while typing ===> ', data);
+    client.to(data.room).emit('typing', `${data.user} is typing...`);
+  }
+
+  // socket.on("typing", (data) => {
+  //   //socket.to(data.room).emit('typing' , `${users[socket.id]} is typing...`);
+  //   socket.to(data.room).emit("typing", `${users[socket.id]} is typing...`);
+  // });
 }

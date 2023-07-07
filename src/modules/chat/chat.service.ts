@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Chat } from './chat.entity';
+import { Chat } from './entities/chat.entity';
 import { CHAT_REPOSITORY } from 'src/core/constants';
 
 @Injectable()
@@ -9,6 +9,8 @@ export class ChatService {
   ) {}
 
   async createMessage(chat: Chat): Promise<Chat> {
+    console.log('inside the createMessage ===>', chat);
+
     return await this.chatRepository.create(chat);
   }
 
