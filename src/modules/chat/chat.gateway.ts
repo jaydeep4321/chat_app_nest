@@ -96,8 +96,26 @@ export class ChatGateway
     client.to(data.room).emit('typing', `${data.user} is typing...`);
   }
 
-  // socket.on("typing", (data) => {
-  //   //socket.to(data.room).emit('typing' , `${users[socket.id]} is typing...`);
-  //   socket.to(data.room).emit("typing", `${users[socket.id]} is typing...`);
-  // });
+  getFileData(data){
+    let binary = Buffer.from(data.file).toString('base64'); //or Buffer.from(data, 'binary')
+  
+    let file_data = {
+      user: data.username,
+      file: `data:image/png;base64,${binary}`,
+      fileName: data.fileName,
+      time: data.time,
+      room:data.room
+    }
+    return file_data;
+  }
+
+  @SubscribeMessage('base64 file')
+  handleFile(client: Socket, data: any) {
+    console.log('data or file.....',data)
+    // client.in(data.room).emit('base64 file', this.getFileData(data))
+    this.server.to(data.room).emit('base64 file', this.getFileData(data));
+  }
+
+  
+
 }

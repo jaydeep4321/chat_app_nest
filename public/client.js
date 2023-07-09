@@ -82,6 +82,39 @@ function sendMessage(message) {
   socket.emit('send-chat', data);
 }
 
+// function appendMessage(data, type) {
+//   console.log('appendmessage', data);
+//   let mainDiv = document.createElement('div');
+//   let className = type;
+//   mainDiv.classList.add(className, 'message');
+
+//   var markup;
+//   if (data.file && room == data.room) {
+//     //console.log(`data:image/png;base64,${data.file}`);
+//     markup = `
+//             <img src=${data.file} width="200px"/>
+//             <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
+//             <button class="btn"><i class="fa fa-download"></i> Download</button>
+//             `;
+//     // <img src=${data.file} width="200px"/>
+//   } else if (
+//     (type == 'outgoing' && room == data.room) ||
+//     (data.user == null && room == data.room)
+//   ) {
+//     markup = `
+//             <p>${data.message}</p>
+//             <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
+//         `;
+//   } else {
+//     console.log('appendMessage time :', data);
+//     markup = `
+//             <p>${data.user} : ${data.message} </p>
+//             <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
+//         `;
+//   }
+//   mainDiv.innerHTML = markup;
+//   messageArea.appendChild(mainDiv);
+// }
 function appendMessage(data, type) {
   console.log('appendmessage', data);
   let mainDiv = document.createElement('div');
@@ -90,29 +123,37 @@ function appendMessage(data, type) {
 
   var markup;
   if (data.file && room == data.room) {
-    //console.log(`data:image/png;base64,${data.file}`);
     markup = `
-            <img src=${data.file} width="200px"/>
-            <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
-            `;
-    // <img src=${data.file} width="200px"/>
+      <img src=${data.file} width="200px"/>
+      <div style="margin-left:auto; font-size: smaller;">${data.time}</div>
+      <button class="btn" onclick="downloadFile('${data.file}', '${data.fileName}')">
+        <i class="fa fa-download"></i> Download
+      </button>
+    `;
   } else if (
     (type == 'outgoing' && room == data.room) ||
     (data.user == null && room == data.room)
   ) {
     markup = `
-            <p>${data.message}</p>
-            <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
-        `;
+      <p>${data.message}</p>
+      <div style="margin-left:auto; font-size: smaller;">${data.time}</div>
+    `;
   } else {
-    console.log('appendMessage time :', data);
+    console.log('appendMessage time:', data);
     markup = `
-            <p>${data.user} : ${data.message} </p>
-            <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
-        `;
+      <p>${data.user} : ${data.message}</p>
+      <div style="margin-left:auto; font-size: smaller;">${data.time}</div>
+    `;
   }
   mainDiv.innerHTML = markup;
   messageArea.appendChild(mainDiv);
+}
+
+function downloadFile(fileUrl, fileName) {
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = fileName;
+  link.click();
 }
 
 function getTime() {
