@@ -11,6 +11,7 @@ let messageArea = document.querySelector('.message__area');
 var form = document.getElementById('form');
 var uploadImage = document.getElementById('file');
 var showImage = document.getElementById('showImage');
+// const inputElement = document.getElementById('inputElement');
 
 var uname = localStorage.getItem('uname');
 console.log(uname);
@@ -56,6 +57,7 @@ uploadImage.addEventListener('change', function (e) {
   //alert("Image uploaded")
   e.target.value = '';
   readThenSendFile(data);
+  // upload(data);
 });
 
 function leave() {
@@ -123,13 +125,34 @@ function appendMessage(data, type) {
 
   var markup;
   if (data.file && room == data.room) {
-    markup = `
-      <img src=${data.file} width="200px"/>
-      <div style="margin-left:auto; font-size: smaller;">${data.time}</div>
+    if (data.fileName.split('.').pop() === 'pdf') {
+      markup = `
+      <img src="/pdf.png" width="100px"/>
+      <div style="margin-left:auto; font-size: medium;">${data.fileName}</div>
       <button class="btn" onclick="downloadFile('${data.file}', '${data.fileName}')">
-        <i class="fa fa-download"></i> Download
+      <i class="fa fa-download"></i> Download
       </button>
+      <div style="margin-left:auto; font-size: smaller;">${data.time}</div>
     `;
+    } else if (data.fileName.split('.').pop() === 'csv') {
+      markup = `
+      <img src="/csv.png" width="100px"/>
+      <div style="margin-left:auto; font-size: medium;">${data.fileName}</div>
+      <button class="btn" onclick="downloadFile('${data.file}', '${data.fileName}')">
+      <i class="fa fa-download"></i> Download
+      </button>
+      <div style="margin-left:auto; font-size: smaller;">${data.time}</div>
+    `;
+    } else {
+      markup = `
+      <img src=${data.file} width="200px"/>
+      <div style="margin-left:auto; font-size: medium;">${data.fileName}</div>
+      <button class="btn" onclick="downloadFile('${data.file}', '${data.fileName}')">
+      <i class="fa fa-download"></i> Download
+      </button>
+      <div style="margin-left:auto; font-size: smaller;">${data.time}</div>
+    `;
+    }
   } else if (
     (type == 'outgoing' && room == data.room) ||
     (data.user == null && room == data.room)
@@ -170,14 +193,15 @@ function getTime() {
 function readThenSendFile(data) {
   var reader = new FileReader();
   reader.onload = function (evt) {
-    var msg = {};
+    var file = {};
     console.log('In read...:', evt);
-    msg.username = uname;
-    msg.file = evt.target.result;
-    msg.fileName = data.name;
-    msg.time = getTime();
-    msg.room = room;
-    socket.emit('base64 file', msg);
+    file.username = uname;
+    file.file = evt.target.result;
+    file.fileName = data.name;
+    file.time = getTime();
+    file.room = room;
+    // socket.emit('base64 file', file);
+    socket.emit('upload', file);
   };
   //console.log("");
   reader.readAsArrayBuffer(data);
@@ -185,6 +209,14 @@ function readThenSendFile(data) {
 }
 
 // Recieve messages
+
+function upload(files) {
+  // const data = e.target.files[0];
+  socket.emit('upload', files, (status) => {
+    console.log('..i am here..');
+    console.log(status);
+  });
+}
 
 socket.on('user-joined', (data) => {
   //console.log("CLIENT:", data);
@@ -224,7 +256,13 @@ socket.on('typing', (data) => {
   }, 3000);
 });
 
-socket.on('base64 file', (payload) => {
+// socket.on('base64 file', (payload) => {
+//   console.log('file data:', payload);
+//   appendMessage(payload, 'incoming');
+//   scrollToBottom();
+// });
+
+socket.on('upload', (payload) => {
   console.log('file data:', payload);
   appendMessage(payload, 'incoming');
   scrollToBottom();
@@ -233,3 +271,7 @@ socket.on('base64 file', (payload) => {
 function scrollToBottom() {
   messageArea.scrollTop = messageArea.scrollHeight;
 }
+
+// const io = new Server(httpServer, {
+//   maxHttpBufferSize: 1e8,
+// });

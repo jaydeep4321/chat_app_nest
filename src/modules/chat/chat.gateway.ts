@@ -9,9 +9,12 @@ import {
 import { Socket, Server } from 'socket.io';
 import { Chat } from './entities/chat.entity';
 import { ChatService } from './chat.service';
-import { promises } from 'dns';
 import { RoomService } from '../room/room.service';
 import { Room } from '../room/entities/room.entity';
+import { readFileSync, writeFileSync } from 'fs';
+import { UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -96,26 +99,79 @@ export class ChatGateway
     client.to(data.room).emit('typing', `${data.user} is typing...`);
   }
 
-  getFileData(data){
-    let binary = Buffer.from(data.file).toString('base64'); //or Buffer.from(data, 'binary')
-  
-    let file_data = {
-      user: data.username,
-      file: `data:image/png;base64,${binary}`,
-      fileName: data.fileName,
-      time: data.time,
-      room:data.room
+  getFileData(data) {
+    const binary = Buffer.from(data.file).toString('base64'); //or Buffer.from(data, 'binary')
+
+    if (data.fileName.split('.').pop() === 'csv') {
+      console.log('inside the csv....');
+      console.log('binary for csv ==>', binary);
+      const file_data = {
+        user: data.username,
+        file: `data:text/csv;base64,${binary}`,
+        fileName: data.fileName,
+        time: data.time,
+        room: data.room,
+      };
+      console.log('file_data for csv ==>', file_data);
+      return file_data;
+    } else if (data.fileName.split('.').pop() === 'jpeg' || 'png' || 'jpg') {
+      const file_data = {
+        user: data.username,
+        file: `data:image/${data.fileName.split('.').pop()};base64,${binary}`,
+        fileName: data.fileName,
+        time: data.time,
+        room: data.room,
+      };
+      console.log('this is the file_data ===> ', file_data);
+      return file_data;
+    } else if (data.fileName.split('.').pop() === 'pdf') {
+      console.log('inside the pdf....');
+      const file_data = {
+        user: data.username,
+        file: `data:text/${data.fileName.split('.').pop()};base64,${binary}`,
+        fileName: data.fileName,
+        time: data.time,
+        room: data.room,
+      };
+      return file_data;
+    } else {
+      console.log('Not valid type');
     }
-    return file_data;
+
+    // const file_data = {
+    //   user: data.username,
+    //   file: `data:image/png;base64,${binary}`,
+    //   fileName: data.fileName,
+    //   time: data.time,
+    //   room: data.room,
+    // };
+    // return file_data;
   }
 
   @SubscribeMessage('base64 file')
   handleFile(client: Socket, data: any) {
-    console.log('data or file.....',data)
+    console.log('data or file.....', data);
     // client.in(data.room).emit('base64 file', this.getFileData(data))
     this.server.to(data.room).emit('base64 file', this.getFileData(data));
   }
 
-  
+  @SubscribeMessage('upload')
+  // @UseInterceptors(FileInterceptor('file'))
+  handleUpload(client: Socket, data: any) {
+    console.log('data for uploading...', data);
 
+    const filename = `file-${Date.now()}.${data.fileName.split('.').pop()}`;
+    writeFileSync(`./temp/upload/${filename}`, data.file);
+    this.server.to(data.room).emit('upload', this.getFileData(data));
+  }
+
+  // @SubscribeMessage('upload')
+  // @UseInterceptors(FileInterceptor('file'))
+  // handleUpload(client: Socket, @UploadedFiles() file: Express.Multer.File) {
+  //   console.log('data for uploading...', file);
+
+  // const filename = `file-${Date.now()}.${file.fileName.split('.').pop()}`;
+  // writeFileSync(`./temp/upload/${filename}`, data.file);
+  // this.server.to(data.room).emit('upload', this.getFileData(data));
+  // }
 }
