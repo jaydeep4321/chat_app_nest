@@ -200,8 +200,8 @@ function readThenSendFile(data) {
     file.fileName = data.name;
     file.time = getTime();
     file.room = room;
-    // socket.emit('base64 file', file);
-    socket.emit('upload', file);
+    socket.emit('base64 file', file);
+    // socket.emit('upload', file);
   };
   //console.log("");
   reader.readAsArrayBuffer(data);
@@ -212,10 +212,7 @@ function readThenSendFile(data) {
 
 function upload(files) {
   // const data = e.target.files[0];
-  socket.emit('upload', files, (status) => {
-    console.log('..i am here..');
-    console.log(status);
-  });
+  socket.emit('upload', files[0]);
 }
 
 socket.on('user-joined', (data) => {

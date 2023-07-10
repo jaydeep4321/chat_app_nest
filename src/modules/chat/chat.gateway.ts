@@ -155,23 +155,24 @@ export class ChatGateway
     this.server.to(data.room).emit('base64 file', this.getFileData(data));
   }
 
-  @SubscribeMessage('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  handleUpload(client: Socket, data: any) {
-    console.log('data for uploading...', data);
-
-    const filename = `file-${Date.now()}.${data.fileName.split('.').pop()}`;
-    writeFileSync(`./temp/upload/${filename}`, data.file);
-    this.server.to(data.room).emit('upload', this.getFileData(data));
-  }
-
   // @SubscribeMessage('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // handleUpload(client: Socket, @UploadedFiles() file: Express.Multer.File) {
-  //   console.log('data for uploading...', file);
+  // // @UseInterceptors(FileInterceptor('file'))
+  // handleUpload(client: Socket, data: any) {
+  //   console.log('data for uploading...', data);
 
-  // const filename = `file-${Date.now()}.${file.fileName.split('.').pop()}`;
-  // writeFileSync(`./temp/upload/${filename}`, data.file);
-  // this.server.to(data.room).emit('upload', this.getFileData(data));
+  //   const filename = `file-${Date.now()}.${data.fileName.split('.').pop()}`;
+  //   writeFileSync(`./temp/upload/${filename}`, data.file);
+  //   this.server.to(data.room).emit('upload', this.getFileData(data));
   // }
+
+  @SubscribeMessage('upload')
+  @UseInterceptors(FileInterceptor('files'))
+  handleUpload(
+    client: Socket,
+    @UploadedFiles()
+    files: Express.Multer.File,
+    // files: any,
+  ) {
+    console.log('data for uploading...', files);
+  }
 }
