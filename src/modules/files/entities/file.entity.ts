@@ -5,12 +5,10 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
-  HasMany,
 } from 'sequelize-typescript';
-import { Chat } from 'src/modules/chat/entities/chat.entity';
 
 @Table
-export class Room extends Model<Room> {
+export class File extends Model<File> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
@@ -21,18 +19,25 @@ export class Room extends Model<Room> {
     // unique: true,
     allowNull: false,
   })
-  user: string;
+  name: string;
+
+  @Column({
+    type: DataType.INTEGER,
+  })
+  size: number;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  path: string;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  extension: string;
 
   @Column({
     type: DataType.STRING,
   })
   room: string;
-
-  @Column({
-    type: DataType.STRING,
-  })
-  time: string;
-
-  @HasMany(() => Chat)
-  chat: Chat[];
 }

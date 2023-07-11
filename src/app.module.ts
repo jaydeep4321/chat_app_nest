@@ -5,9 +5,10 @@ import { ChatGateway } from './modules/chat/chat.gateway';
 import { ChatModule } from './modules/chat/chat.module';
 import { DatabaseModule } from './core/database/database.module';
 import { RoomModule } from './modules/room/room.module';
+import { FileModule } from './modules/files/file.module';
 
 @Module({
-  imports: [ChatModule, DatabaseModule, RoomModule],
+  imports: [ChatModule, DatabaseModule, RoomModule, FileModule],
   controllers: [AppController],
   providers: [AppService, ChatGateway],
 })

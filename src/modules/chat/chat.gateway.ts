@@ -7,13 +7,19 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { Chat } from './entities/chat.entity';
 import { ChatService } from './chat.service';
 import { RoomService } from '../room/room.service';
 import { Room } from '../room/entities/room.entity';
-import { readFileSync, writeFileSync } from 'fs';
-import { UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { multerOptions } from 'src/utils/multer.config';
+import { writeFileSync } from 'fs';
+import { FileService } from '../files/file.service';
+import { File } from '../files/entities/file.entity';
+import { Request } from 'express';
 
 @WebSocketGateway({
   cors: {
@@ -26,6 +32,7 @@ export class ChatGateway
   constructor(
     private chatService: ChatService,
     private roomService: RoomService,
+    private fileService: FileService,
   ) {}
 
   @WebSocketServer() server: Server;
@@ -137,42 +144,52 @@ export class ChatGateway
     } else {
       console.log('Not valid type');
     }
-
-    // const file_data = {
-    //   user: data.username,
-    //   file: `data:image/png;base64,${binary}`,
-    //   fileName: data.fileName,
-    //   time: data.time,
-    //   room: data.room,
-    // };
-    // return file_data;
   }
 
-  @SubscribeMessage('base64 file')
-  handleFile(client: Socket, data: any) {
-    console.log('data or file.....', data);
-    // client.in(data.room).emit('base64 file', this.getFileData(data))
-    this.server.to(data.room).emit('base64 file', this.getFileData(data));
-  }
-
-  // @SubscribeMessage('upload')
-  // // @UseInterceptors(FileInterceptor('file'))
-  // handleUpload(client: Socket, data: any) {
-  //   console.log('data for uploading...', data);
-
-  //   const filename = `file-${Date.now()}.${data.fileName.split('.').pop()}`;
-  //   writeFileSync(`./temp/upload/${filename}`, data.file);
-  //   this.server.to(data.room).emit('upload', this.getFileData(data));
+  // @SubscribeMessage('base64 file')
+  // handleFile(client: Socket, data: any) {
+  //   console.log('data or file.....', data);
+  //   // client.in(data.room).emit('base64 file', this.getFileData(data))
+  //   this.server.to(data.room).emit('base64 file', this.getFileData(data));
   // }
 
   @SubscribeMessage('upload')
-  @UseInterceptors(FileInterceptor('files'))
-  handleUpload(
-    client: Socket,
-    @UploadedFiles()
-    files: Express.Multer.File,
-    // files: any,
-  ) {
-    console.log('data for uploading...', files);
+  // @UseInterceptors(FileInterceptor('file'))
+  async handleUpload(client: Socket, data: any) {
+    console.log('whole socket', client);
+    console.log('data for uploading...', data);
+
+    const filename = `file-${Date.now()}.${data.fileName.split('.').pop()}`;
+    writeFileSync(`./public/upload/${filename}`, data.file);
+
+    const file_data: any = {};
+
+    file_data.name = filename;
+    file_data.size = data.size;
+    file_data.room = data.room;
+    file_data.extension = data.fileName.split('.').pop();
+    // file_data.path = `http://localhost:${process.env.PORT}/public/upload`;
+    file_data.path = client.handshake.headers.origin + '/upload';
+
+    console.log('file data before saving to the database', file_data);
+
+    const url = file_data.path + '/' + filename;
+    console.log('url for the file....====>', url);
+
+    const file = await this.fileService.createFile(file_data);
+    console.log('inside the handleUpload', file);
+    this.server.to(data.room).emit('upload', this.getFileData(data));
+    // this.server.to(data.room).emit('upload', url);
   }
+
+  // @UseInterceptors(FileInterceptor('files', multerOptions))
+  // @SubscribeMessage('upload')
+  // handleUpload(
+  //   client: Socket,
+  //   @UploadedFiles()
+  //   files: Array<Express.Multer.File>,
+  //   // files: any,
+  // ) {
+  //   console.log('data for uploading...', files);
+  // }
 }

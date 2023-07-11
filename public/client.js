@@ -84,39 +84,6 @@ function sendMessage(message) {
   socket.emit('send-chat', data);
 }
 
-// function appendMessage(data, type) {
-//   console.log('appendmessage', data);
-//   let mainDiv = document.createElement('div');
-//   let className = type;
-//   mainDiv.classList.add(className, 'message');
-
-//   var markup;
-//   if (data.file && room == data.room) {
-//     //console.log(`data:image/png;base64,${data.file}`);
-//     markup = `
-//             <img src=${data.file} width="200px"/>
-//             <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
-//             <button class="btn"><i class="fa fa-download"></i> Download</button>
-//             `;
-//     // <img src=${data.file} width="200px"/>
-//   } else if (
-//     (type == 'outgoing' && room == data.room) ||
-//     (data.user == null && room == data.room)
-//   ) {
-//     markup = `
-//             <p>${data.message}</p>
-//             <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
-//         `;
-//   } else {
-//     console.log('appendMessage time :', data);
-//     markup = `
-//             <p>${data.user} : ${data.message} </p>
-//             <div style = "margin-left:auto; font-size: smaller;">${data.time}</div>
-//         `;
-//   }
-//   mainDiv.innerHTML = markup;
-//   messageArea.appendChild(mainDiv);
-// }
 function appendMessage(data, type) {
   console.log('appendmessage', data);
   let mainDiv = document.createElement('div');
@@ -200,8 +167,9 @@ function readThenSendFile(data) {
     file.fileName = data.name;
     file.time = getTime();
     file.room = room;
-    socket.emit('base64 file', file);
-    // socket.emit('upload', file);
+    file.size = data.size;
+    // socket.emit('base64 file', file);
+    socket.emit('upload', file);
   };
   //console.log("");
   reader.readAsArrayBuffer(data);

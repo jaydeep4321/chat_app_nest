@@ -27,15 +27,13 @@
           rows="1"
           placeholder="Write a message..."
         ></textarea>
-        <!-- <form
-          action="http://localhost:3001"
-          method="post"
-          enctype="multipart/form-data"
-        > -->
-        <!-- <input type="file" id="file" /> -->
-        <input type="file" onchange="upload(this.files)" />
-        <!-- <input type="file" id="inputElement" /> -->
+        <input type="file" id="file" />
+        <!-- <form id="form" enctype="multipart/form-data"> -->
+        <!-- <input type="file" onchange="upload(this.files)" /> -->
+        <!-- <input id="file" type="file" multiple /> -->
+        <!-- <button class="submit-btn" type="submit">Upload</button> -->
         <!-- </form> -->
+        <!-- <input type="file" id="inputElement" /> -->
       </div>
     </section>
     <script src="/socket.io/socket.io.js"></script>
