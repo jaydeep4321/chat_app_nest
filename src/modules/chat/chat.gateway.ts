@@ -48,7 +48,9 @@ export class ChatGateway
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(`Connected ${client.id}`);
+    // console.log(`Connected ${client.id}`);
+    console.log(`Connected `, client);
+
     //Do stuffs
   }
 
@@ -61,6 +63,7 @@ export class ChatGateway
   @SubscribeMessage('room')
   async handleJoinRoom(client: Socket, data: Room) {
     console.log('data before room joined!!', data);
+
     const room = await this.roomService.createRoom(data);
     // console.log(room);
     client.join(data.room);
@@ -106,6 +109,7 @@ export class ChatGateway
     client.to(data.room).emit('typing', `${data.user} is typing...`);
   }
 
+  //=========== old getFileData ===========//
   getFileData(data) {
     const binary = Buffer.from(data.file).toString('base64'); //or Buffer.from(data, 'binary')
 
@@ -146,6 +150,23 @@ export class ChatGateway
     }
   }
 
+  //=========== new getFileData ===========//
+  // getFileData(data) {
+  //   if (data.name.split('.').pop() === 'jpeg' || 'png' || 'jpg') {
+  //     const file_data = {
+  //       user: data.username,
+  //       file: `data:image/${data.fileName.split('.').pop()};base64,${binary}`,
+  //       fileName: data.fileName,
+  //       time: data.time,
+  //       room: data.room,
+  //     };
+  //     console.log('this is the file_data ===> ', file_data);
+  //     return file_data;
+  //   } else {
+  //     console.log('Not valid type');
+  //   }
+  // }
+
   // @SubscribeMessage('base64 file')
   // handleFile(client: Socket, data: any) {
   //   console.log('data or file.....', data);
@@ -156,8 +177,8 @@ export class ChatGateway
   @SubscribeMessage('upload')
   // @UseInterceptors(FileInterceptor('file'))
   async handleUpload(client: Socket, data: any) {
-    console.log('whole socket', client);
-    console.log('data for uploading...', data);
+    // console.log('whole socket', client);
+    // console.log('data for uploading...', data);
 
     const filename = `file-${Date.now()}.${data.fileName.split('.').pop()}`;
     writeFileSync(`./public/upload/${filename}`, data.file);
@@ -171,7 +192,7 @@ export class ChatGateway
     // file_data.path = `http://localhost:${process.env.PORT}/public/upload`;
     file_data.path = client.handshake.headers.origin + '/upload';
 
-    console.log('file data before saving to the database', file_data);
+    // console.log('file data before saving to the database', file_data);
 
     const url = file_data.path + '/' + filename;
     console.log('url for the file....====>', url);

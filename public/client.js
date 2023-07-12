@@ -53,7 +53,8 @@ textarea.addEventListener('keypress', (e) => {
 
 uploadImage.addEventListener('change', function (e) {
   var data = e.target.files[0];
-  console.log(data);
+  // const data = ;
+  console.log('in uploadImage ===>', data);
   //alert("Image uploaded")
   e.target.value = '';
   readThenSendFile(data);

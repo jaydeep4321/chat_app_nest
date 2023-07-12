@@ -6,6 +6,17 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get('/')
+  @Render('login')
+  Login() {
+    // return { message: 'Hello world!' };
+  }
+
+  @Get('/register')
+  @Render('register')
+  Register() {
+    // return { message: 'Hello world!' };
+  }
+  @Get('/home')
   @Render('index')
   Home() {
     // return { message: 'Hello world!' };

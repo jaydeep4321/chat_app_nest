@@ -4,6 +4,7 @@ import { databaseConfig } from './database.config';
 import { Chat } from 'src/modules/chat/entities/chat.entity';
 import { Room } from 'src/modules/room/entities/room.entity';
 import { File } from 'src/modules/files/entities/file.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 export const databaseProviders = [
   {
@@ -24,7 +25,7 @@ export const databaseProviders = [
           config = databaseConfig.development;
       }
       const sequelize = new Sequelize(config);
-      sequelize.addModels([Chat, Room, File]);
+      sequelize.addModels([Chat, Room, File, User]);
       await sequelize.sync();
       return sequelize;
     },
