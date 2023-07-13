@@ -5,9 +5,12 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
+  BelongsToMany,
   HasMany,
 } from 'sequelize-typescript';
 import { Chat } from 'src/modules/chat/entities/chat.entity';
+import { RoomUser } from 'src/modules/room-user/entities/room-user.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Table
 export class Room extends Model<Room> {
@@ -18,21 +21,12 @@ export class Room extends Model<Room> {
 
   @Column({
     type: DataType.STRING,
-    // unique: true,
-    allowNull: false,
   })
-  user: string;
+  name: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  room: string;
-
-  @Column({
-    type: DataType.STRING,
-  })
-  time: string;
+  @BelongsToMany(() => User, () => RoomUser)
+  users: User[];
 
   @HasMany(() => Chat)
-  chat: Chat[];
+  Chats: Chat[];
 }

@@ -16,7 +16,7 @@ export class UsersController {
   async getOne(@Param('id') id: string, @Res() res) {
     const user = await this.userService.findOneById(parseInt(id));
 
-    user.password = undefined;
+    // user.password = undefined;
     return user;
   }
 

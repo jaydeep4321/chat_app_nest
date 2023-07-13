@@ -20,6 +20,9 @@ import { writeFileSync } from 'fs';
 import { FileService } from '../files/file.service';
 import { File } from '../files/entities/file.entity';
 import { Request } from 'express';
+import { UsersService } from '../users/users.service';
+import { RoomUserService } from '../room-user/room-user.service';
+import { ScopeTableOptions } from 'sequelize-typescript';
 
 @WebSocketGateway({
   cors: {
@@ -33,6 +36,8 @@ export class ChatGateway
     private chatService: ChatService,
     private roomService: RoomService,
     private fileService: FileService,
+    private userService: UsersService,
+    private roomUserService: RoomUserService,
   ) {}
 
   @WebSocketServer() server: Server;
@@ -60,12 +65,49 @@ export class ChatGateway
   //   this.server.emit('recMessage', payload);
   // }
 
+  @SubscribeMessage('createUser')
+  async handleUser(client: Socket, data: any) {
+    //===User data entry =====//
+    console.log('in createUser', data);
+
+    const user = await this.userService.findOneByUserName(data);
+    if (!user) {
+      const user_data: any = {};
+      user_data.name = data.user;
+
+      const user = await this.userService.createUser(user_data);
+
+      client.emit('createUser', user);
+    } else {
+      console.log('before sending to the');
+      client.emit('createUser', user);
+    }
+  }
+
   @SubscribeMessage('room')
-  async handleJoinRoom(client: Socket, data: Room) {
+  async handleJoinRoom(client: Socket, data: any) {
     console.log('data before room joined!!', data);
 
-    const room = await this.roomService.createRoom(data);
-    // console.log(room);
+    //====Room data entry =====//
+    const room = await this.roomService.findRoomByRoomName(data);
+    if (!room) {
+      const room_data: any = {};
+      room_data.name = data.room;
+
+      const room = await this.roomService.createRoom(room_data);
+      console.log('room ===>', room);
+    }
+
+    //==== junction table entry =====//
+    const roomUser_data: any = {};
+    roomUser_data.roomId = room.dataValues.id;
+    roomUser_data.userId = data.id;
+
+    console.log(roomUser_data);
+
+    const roomUser = await this.roomUserService.createRoomUser(roomUser_data);
+    console.log(roomUser);
+
     client.join(data.room);
     client.emit('welcome-to-room', {
       message: `welcome to room - ${data.room}`,
@@ -80,7 +122,7 @@ export class ChatGateway
   }
 
   @SubscribeMessage('leave-room')
-  async handleLeave(client: Socket, data: Room) {
+  async handleLeave(client: Socket, data: any) {
     console.log('data before leave-room', data);
     client.leave(data.room);
     client.to(data.room).emit('left', {
@@ -104,7 +146,7 @@ export class ChatGateway
   }
 
   @SubscribeMessage('typing')
-  handleTyping(client: Socket, data: Room) {
+  handleTyping(client: Socket, data: any) {
     console.log('data while typing ===> ', data);
     client.to(data.room).emit('typing', `${data.user} is typing...`);
   }

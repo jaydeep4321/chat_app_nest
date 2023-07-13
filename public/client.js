@@ -27,20 +27,43 @@ var st = document.getElementById('typing');
 
 document.getElementById('h1').innerHTML = `Room -${room}`;
 
-if (room) {
+if (uname) {
   socket.emit(
-    'room',
+    'createUser',
     { user: uname, room: room, time: getTime() },
-    async function (ack) {
-      //console.log("chat-data:",ack);
-      for (let i = 0; i <= ack.length; i++) {
-        appendMessage(ack[i], 'incoming');
-      }
+    function (ack) {
+      console.log('acknowledge for createUser', ack);
     },
   );
-} else {
-  socket.emit('new-user-joined', { user: uname, time: getTime() });
 }
+
+socket.on('createUser', (payload) => {
+  console.log('on createUser', payload);
+  createRoom(payload.id);
+});
+
+function createRoom(data) {
+  socket.emit('room', { id: data, room: room, time: getTime() });
+}
+
+// if (room) {
+//   console.log('on room before storing room', room);
+//   socket.on('createUser', (payload) => {
+//     console.log('on createUser', payload);
+//     socket.emit(
+//       'room',
+//       { userId: payload.id, room: room, time: getTime() },
+//       async function (ack) {
+//         //console.log("chat-data:",ack);
+//         for (let i = 0; i <= ack.length; i++) {
+//           appendMessage(ack[i], 'incoming');
+//         }
+//       },
+//     );
+//   });
+// } else {
+//   socket.emit('new-user-joined', { user: uname, time: getTime() });
+// }
 
 textarea.addEventListener('keyup', (e) => {
   if (e.key === 'Enter') {
@@ -188,7 +211,7 @@ function upload(files) {
   socket.emit('upload', files[0]);
 }
 
-function checkEmail(email) {}
+// function checkEmail(email) {}
 
 socket.on('user-joined', (data) => {
   //console.log("CLIENT:", data);

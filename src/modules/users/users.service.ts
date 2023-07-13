@@ -4,9 +4,6 @@ import { USER_REPOSITORY } from 'src/core/constants';
 
 @Injectable()
 export class UsersService {
-  create(body: User) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: typeof User,
   ) {}
@@ -19,9 +16,14 @@ export class UsersService {
     return await this.userRepository.findOne<User>({ where: { id } });
   }
 
-  async findOneByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne<User>({ where: { email } });
+  async findOneByUserName(userName: string): Promise<User> {
+    return await this.userRepository.findOne<User>({
+      where: { name: userName },
+    });
   }
+  // async findOneByEmail(email: string): Promise<User> {
+  //   return await this.userRepository.findOne<User>({ where: { email } });
+  // }
 
   async getUserData(): Promise<User[]> {
     return await this.userRepository.findAll();

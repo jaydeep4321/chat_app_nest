@@ -5,9 +5,14 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
+  BelongsToMany,
+  HasMany,
 } from 'sequelize-typescript';
+import { Chat } from 'src/modules/chat/entities/chat.entity';
+import { RoomUser } from 'src/modules/room-user/entities/room-user.entity';
+import { Room } from 'src/modules/room/entities/room.entity';
 
-@Table({ timestamps: false })
+@Table
 export class User extends Model<User> {
   @PrimaryKey
   @AutoIncrement
@@ -17,19 +22,13 @@ export class User extends Model<User> {
   @Column({
     type: DataType.STRING,
     allowNull: false,
-  })
-  username: string;
-
-  @Column({
-    type: DataType.STRING,
     unique: true,
-    allowNull: false,
   })
-  email: string;
+  name: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  password: string;
+  @BelongsToMany(() => Room, () => RoomUser)
+  rooms: Room[];
+
+  @HasMany(() => Chat)
+  Chats: Chat[];
 }

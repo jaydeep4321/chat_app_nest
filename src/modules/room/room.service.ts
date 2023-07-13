@@ -12,6 +12,13 @@ export class RoomService {
     return await this.RoomRepository.create(Room);
   }
 
+  async findRoomByRoomName(roomName: string): Promise<Room> {
+    console.log('roomName before findOne', roomName);
+    return await this.RoomRepository.findOne<Room>({
+      where: { name: roomName },
+    });
+  }
+
   async getRoomData(): Promise<Room[]> {
     return await this.RoomRepository.findAll();
   }

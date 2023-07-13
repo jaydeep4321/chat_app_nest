@@ -8,6 +8,7 @@ import { RoomModule } from './modules/room/room.module';
 import { FileModule } from './modules/files/file.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { RoomUserModule } from './modules/room-user/room-user.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { AuthModule } from './modules/auth/auth.module';
     RoomModule,
     FileModule,
     UsersModule,
-    AuthModule,
+    // AuthModule,
+    RoomUserModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway],
