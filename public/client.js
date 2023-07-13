@@ -8,7 +8,11 @@ const socket = io('http://localhost:3001', {
 let textarea = document.querySelector('#textarea');
 let messageArea = document.querySelector('.message__area');
 
-var form = document.getElementById('form');
+// log in form data //
+let email = document.getElementById('email');
+let password = document.getElementById('password');
+
+let form = document.getElementById('form');
 var uploadImage = document.getElementById('file');
 var showImage = document.getElementById('showImage');
 // const inputElement = document.getElementById('inputElement');
@@ -183,6 +187,8 @@ function upload(files) {
   // const data = e.target.files[0];
   socket.emit('upload', files[0]);
 }
+
+function checkEmail(email) {}
 
 socket.on('user-joined', (data) => {
   //console.log("CLIENT:", data);

@@ -10,7 +10,14 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
-  imports: [ChatModule, DatabaseModule, RoomModule, FileModule, UsersModule, AuthModule],
+  imports: [
+    ChatModule,
+    DatabaseModule,
+    RoomModule,
+    FileModule,
+    UsersModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService, ChatGateway],
 })

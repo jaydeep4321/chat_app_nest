@@ -5,18 +5,18 @@ import { ChatService } from './chat.service';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Get('/')
-  @Render('login')
-  Login() {
-    // return { message: 'Hello world!' };
-  }
+  // @Get('/')
+  // @Render('login')
+  // Login() {
+  //   // return { message: 'Hello world!' };
+  // }
 
-  @Get('/register')
-  @Render('register')
-  Register() {
-    // return { message: 'Hello world!' };
-  }
-  @Get('/home')
+  // @Get('/register')
+  // @Render('register')
+  // Register() {
+  //   // return { message: 'Hello world!' };
+  // }
+  @Get('/')
   @Render('index')
   Home() {
     // return { message: 'Hello world!' };
