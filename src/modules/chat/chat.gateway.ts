@@ -70,7 +70,7 @@ export class ChatGateway
     //===User data entry =====//
     console.log('in createUser', data);
 
-    const user = await this.userService.findOneByUserName(data);
+    const user = await this.userService.findOneByUserName(data.user);
     if (!user) {
       const user_data: any = {};
       user_data.name = data.user;
@@ -79,7 +79,7 @@ export class ChatGateway
 
       client.emit('createUser', user);
     } else {
-      console.log('before sending to the');
+      console.log('before sending to the client');
       client.emit('createUser', user);
     }
   }
@@ -89,24 +89,35 @@ export class ChatGateway
     console.log('data before room joined!!', data);
 
     //====Room data entry =====//
-    const room = await this.roomService.findRoomByRoomName(data);
+    const room = await this.roomService.findRoomByRoomName(data.room);
+    console.log('room after finding from findRoomByRoomName ==>', room);
     if (!room) {
       const room_data: any = {};
       room_data.name = data.room;
 
       const room = await this.roomService.createRoom(room_data);
       console.log('room ===>', room);
+
+      //==== junction table entry =====//
+      const roomUser_data: any = {};
+      roomUser_data.roomId = room.dataValues.id;
+      roomUser_data.userId = data.id;
+
+      console.log(roomUser_data);
+
+      const roomUser = await this.roomUserService.createRoomUser(roomUser_data);
+      console.log(roomUser);
     }
 
     //==== junction table entry =====//
-    const roomUser_data: any = {};
-    roomUser_data.roomId = room.dataValues.id;
-    roomUser_data.userId = data.id;
+    // const roomUser_data: any = {};
+    // roomUser_data.roomId = room.dataValues.id;
+    // roomUser_data.userId = data.id;
 
-    console.log(roomUser_data);
+    // console.log(roomUser_data);
 
-    const roomUser = await this.roomUserService.createRoomUser(roomUser_data);
-    console.log(roomUser);
+    // const roomUser = await this.roomUserService.createRoomUser(roomUser_data);
+    // console.log(roomUser);
 
     client.join(data.room);
     client.emit('welcome-to-room', {
