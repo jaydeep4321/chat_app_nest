@@ -79,18 +79,19 @@ export class ChatGateway
 
       client.emit('createUser', user);
     } else {
-      console.log('before sending to the client');
+      // console.log('before sending to the client');
       client.emit('createUser', user);
     }
   }
 
   @SubscribeMessage('room')
   async handleJoinRoom(client: Socket, data: any) {
-    console.log('data before room joined!!', data);
+    // console.log('data before room joined!!', data);
 
     //====Room data entry =====//
     const room = await this.roomService.findRoomByRoomName(data.room);
     console.log('room after finding from findRoomByRoomName ==>', room);
+    client.emit('room', room);
     if (!room) {
       const room_data: any = {};
       room_data.name = data.room;
@@ -110,14 +111,17 @@ export class ChatGateway
     }
 
     //==== junction table entry =====//
-    // const roomUser_data: any = {};
-    // roomUser_data.roomId = room.dataValues.id;
-    // roomUser_data.userId = data.id;
+    const roomUser_data: any = {};
+    roomUser_data.roomId = room.dataValues.id;
+    roomUser_data.userId = data.id;
 
-    // console.log(roomUser_data);
+    const search = await this.roomUserService.getDataById(roomUser_data);
+    console.log(search);
 
-    // const roomUser = await this.roomUserService.createRoomUser(roomUser_data);
-    // console.log(roomUser);
+    if (!search) {
+      const roomUser = await this.roomUserService.createRoomUser(roomUser_data);
+      console.log(roomUser);
+    }
 
     client.join(data.room);
     client.emit('welcome-to-room', {

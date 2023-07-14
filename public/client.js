@@ -39,12 +39,18 @@ if (uname) {
 
 socket.on('createUser', (payload) => {
   console.log('on createUser', payload);
+  localStorage.setItem('user', JSON.stringify(payload));
   createRoom(payload.id);
 });
 
 function createRoom(data) {
-  socket.emit('room', { id: data, room: room, time: getTime() });
+  socket.emit('room', { id: data, user: uname, room: room, time: getTime() });
 }
+
+socket.on('room', (payload) => {
+  console.log('on room', payload);
+  localStorage.setItem('room_data', JSON.stringify(payload));
+});
 
 // if (room) {
 //   console.log('on room before storing room', room);
@@ -96,11 +102,18 @@ function leave() {
 
 function sendMessage(message) {
   console.log(message);
+  let user = JSON.parse(localStorage.getItem('user'));
+  console.log('localStorage user', user);
+  const userId = user.id;
+  let room = JSON.parse(localStorage.getItem('room_data'));
+  const roomId = room.id;
   let data = {
     time: getTime(),
     room: message.room,
     message: message.msg || message.message.trim(),
     user: message.user,
+    userId: userId,
+    roomId: roomId,
   };
   // Append
   appendMessage(data, 'outgoing');
